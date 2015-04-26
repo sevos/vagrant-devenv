@@ -8,3 +8,5 @@
       when: "'vagrant-dns' not in vagrant_plugin_list.stdout"
     - name: Ensure local resolver is installed
       shell: vagrant dns --install
+    - name: Generate CA Certificate
+      shell: cd .. && make ssl/ca.crt ssl/ca.key
