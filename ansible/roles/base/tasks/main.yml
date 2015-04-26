@@ -1,0 +1,16 @@
+---
+# tasks file for base
+- name: 'Allow user to do anything with sudo'
+  sudo: yes
+  lineinfile:
+    dest: /etc/sudoers
+    line: '{{ansible_ssh_user}} ALL=(ALL) NOPASSWD:ALL'
+    validate: 'visudo -cf %s'
+- name: Install base packages
+  sudo: yes
+  apt: name={{item}}
+  with_items:
+    - curl
+    - git-core
+    - python-pip
+    - tmux

@@ -1,0 +1,15 @@
+---
+- name: 'Install postgresql packages'
+  sudo: yes
+  apt: name={{item}} update_cache=yes
+  with_items:
+    - postgresql
+    - postgresql-contrib
+    - libpq-dev
+- name: 'Create postgres user'
+  sudo: yes
+  sudo_user: postgres
+  shell: psql -c "CREATE ROLE {{ user }} LOGIN SUPERUSER PASSWORD '{{ password }}';"
+  register: postgres_user
+  failed_when: 'postgres_user.rc != 0 and "already exists" not in postgres_user.stderr'
+  changed_when: '"already exists" not in postgres_user.stderr'

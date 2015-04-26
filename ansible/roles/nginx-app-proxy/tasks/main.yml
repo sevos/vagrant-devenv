@@ -1,0 +1,46 @@
+---
+- name: install nginx
+  sudo: yes
+  tags: nginx
+  apt: name=nginx state=present
+
+- name: Ensure CA certificate exists
+  tags: nginx
+  local_action: shell cd ../.. &&  make ssl/ca.crt ssl/ca.key
+  sudo: no
+  when: not not ssl_domain
+
+- name: Generate server certificate
+  tags: nginx
+  local_action: shell cd ../.. && mkdir -p projects/{{project_name}}/ssl && rm -f projects/{{project_name}}/ssl/* && DOMAIN="{{ssl_domain}}.dev" make projects/{{project_name}}/ssl/{{ssl_domain}}.crt  projects/{{project_name}}/ssl/{{ssl_domain}}.key
+  sudo: no
+  when: not not ssl_domain
+
+- name: Upload SSL certificate key
+  sudo: yes
+  tags: nginx
+  copy: src=ssl/{{ ssl_domain }}.key dest=/etc/nginx/{{ ssl_domain }}.key owner=www-data mode=0400
+  when: not not ssl_domain
+  notify:
+    - reload nginx
+
+- name: Upload SSL certificate
+  sudo: yes
+  tags: nginx
+  copy: src=ssl/{{ ssl_domain }}.crt dest=/etc/nginx/{{ ssl_domain }}.crt owner=www-data mode=0400
+  when: not not ssl_domain
+
+- name: configure proxy with SSL
+  sudo: yes
+  tags: nginx
+  template: src=proxy-ssl.j2 dest=/etc/nginx/sites-available/default
+  notify:
+    - reload nginx
+  when: not not ssl_domain
+
+- name: configure proxy
+  tags: nginx
+  template: src=proxy.j2 dest=/etc/nginx/sites-available/default
+  notify:
+    - reload nginx
+  when: not ssl_domain

@@ -1,0 +1,3 @@
+---
+- set_fact:
+    emacs_prelude_repo: git://github.com/sevos/prelude.git

@@ -1,0 +1,25 @@
+---
+# tasks file for emacs
+- name: 'Add emacs PPA'
+  sudo: yes
+  apt_repository: repo=ppa:alexmurray/emacs
+- name: 'Uninstall emacs'
+  sudo: yes
+  apt: name=emacs24-nox state=absent
+- name: 'Install emacs'
+  sudo: yes
+  apt:
+    name:
+      - git-core
+      - emacs24
+      - silversearcher-ag
+- name: 'Install emacs configuration'
+  sudo: no
+  git: repo={{ emacs_prelude_repo }} dest=/home/{{ansible_ssh_user}}/.emacs.d force=yes accept_hostkey=yes
+# TODO: create fallback in emacs config
+- name: 'Link ls as GNU ls for emacs config'
+  sudo: yes
+  file:
+    path: /usr/local/bin/gls
+    src: /bin/ls
+    state: link

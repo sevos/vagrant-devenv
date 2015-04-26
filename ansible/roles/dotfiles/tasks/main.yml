@@ -1,0 +1,16 @@
+---
+# tasks file for dotfiles
+- name: Install zsh
+  apt: name=zsh
+  sudo: yes
+- name: Clone oh-my-zsh repo
+  git: repo=git://github.com/robbyrussell/oh-my-zsh.git dest=/home/{{user}}/.oh-my-zsh accept_hostkey=yes force=yes
+- name: Set zsh as default shell
+  sudo: yes
+  user: name={{user}} shell=/bin/zsh
+- name: Install dotfiles
+  file: path=/home/{{user}}/.dotfiles src=/vagrant/dotfiles state=link
+- name: Link dotfiles
+  shell: for file in /home/{{user}}/.dotfiles/link/*; do ln -sf $file /home/{{user}}/.$(basename $file); done
+- name: Create directory for custom scripts
+  file: path=/home/{{user}}/.zshrc.d state=directory

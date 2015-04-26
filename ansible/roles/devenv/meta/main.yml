@@ -1,0 +1,8 @@
+---
+dependencies:
+  - role: base
+    sudo: yes
+  - role: dotfiles
+    sudo: no
+  - role: emacs
+    sudo: yes

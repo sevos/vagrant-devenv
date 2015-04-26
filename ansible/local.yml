@@ -1,0 +1,10 @@
+- hosts: local
+  tasks:
+    - name: Detect if vagrant-dns plugin is installed
+      shell: vagrant plugin list
+      register: vagrant_plugin_list
+    - name: Install vagrant-dns plugin
+      shell: vagrant plugin install vagrant-dns
+      when: "'vagrant-dns' not in vagrant_plugin_list.stdout"
+    - name: Ensure local resolver is installed
+      shell: vagrant dns --install
