@@ -24,3 +24,19 @@ There are two options:
 ```
 git subtree add --prefix=projects/bonusbox git@github.com:bonusboxme/vagrant-devenv-bonusbox.git master
 ```
+
+### For bonusbox
+
+Add your bb github token to your vault:
+
+```
+ansible-vault edit secrets.yml
+```
+
+put there:
+
+```
+---
+- set_fact:
+    secret_github_token: github token from bb/config.sh
+```
