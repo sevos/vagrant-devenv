@@ -9,7 +9,7 @@ recipes to provision VMs.
 1. Install ansible
 2. Install vagrant
 3. Install Virtual Box or VMWare Fusion
-4. Clone this repo
+4. Fork & Clone your copy of this repo
 5. Run `make local`. This will install required vagrant plugins, create CA certificate and initialize your secrets.yml vault
 6. Run `open ssl/ca.crt` and trust the certificate
 
