@@ -12,3 +12,15 @@ recipes to provision VMs.
 4. Clone this repo
 5. Run `make local`. This will install required vagrant plugins, create CA certificate and initialize your secrets.yml vault
 6. Run `open ssl/ca.crt` and trust the certificate
+
+## Add project
+
+There are two options:
+- Just create project in projects/
+- Use git subtree to pull external project
+
+### Pulling external project
+
+```
+git subtree add --prefix=projects/bonusbox git@github.com:bonusboxme/vagrant-devenv-bonusbox.git master
+```
