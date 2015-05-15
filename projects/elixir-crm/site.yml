@@ -1,0 +1,73 @@
+---
+- name: Development
+  hosts: elixir_crm
+  vars:
+    project_name: elixir-crm
+  pre_tasks:
+    - include: ../../configuration.yml
+  roles:
+    - role: devenv
+    - role: postgresql
+    - role: nginx-app-proxy
+      upstream: localhost:5000
+      ssl_domain: dev-crm
+  tasks:
+    - name: "Erlang solutions key"
+      sudo: yes
+      apt_key: url="http://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc"
+    - name: "Erlang solutions repo"
+      sudo: yes
+      apt_repository: repo="deb http://packages.erlang-solutions.com/ubuntu trusty contrib"
+    - name: "Install packages"
+      sudo: yes
+      apt: name={{item}} update_cache=yes
+      with_items:
+        - elixir
+        - python-dev
+        - libyaml-cpp-dev
+    - name: 'Download iojs'
+      get_url:
+        url: https://iojs.org/dist/v1.8.1/iojs-v1.8.1-linux-x64.tar.gz
+        dest: /home/{{ansible_ssh_user}}/iojs-v1.8.1-linux-x64.tar.gz
+    - name: 'Unpack iojs'
+      unarchive:
+        copy: no
+        src: /home/{{ansible_ssh_user}}/iojs-v1.8.1-linux-x64.tar.gz
+        dest: /home/{{ansible_ssh_user}}/
+    - name: 'Enable iojs'
+      copy:
+        dest: /home/{{ansible_ssh_user}}/.zshrc.d/iojs
+        content: "export PATH=/home/{{ansible_ssh_user}}/iojs-v1.8.1-linux-x64/bin:$PATH"
+    - name: Install ember and bower
+      shell: /home/{{ansible_ssh_user}}/iojs-v1.8.1-linux-x64/bin/npm install ember bower -g
+    - name: Install ansible
+      sudo: yes
+      pip: name={{item}}
+      with_items:
+        - ansible
+        - boto
+    - name: Enable ansible to run locally
+      sudo: yes
+      file:
+        src: /usr/bin/python
+        dest: /usr/local/bin/python
+        state: link
+    - name: 'Clone repository'
+      git: repo=git@github.com:sevos/crm-phoenix-ember.git dest=crm accept_hostkey=yes
+    - name: Install packages
+      shell: npm install && bower install
+      args:
+        chdir: /home/{{ansible_ssh_user}}/crm/web
+
+
+- name: Deployment target
+  hosts: elixir_crm_target
+  vars:
+    public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+  roles:
+    - base
+  tasks:
+    - name: Install key
+      lineinfile:
+        dest: "/home/{{ ansible_ssh_user }}/.ssh/authorized_keys"
+        line: "{{public_key}}"

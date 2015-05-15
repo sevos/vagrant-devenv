@@ -1,0 +1,43 @@
+config.vm.define 'elixir_crm' do |config|
+  config.dns.tld = "dev"
+  config.vm.hostname = "dev-crm"
+  config.vm.network "private_network", ip: "192.168.35.11"
+  config.vm.provider "vmware_fusion" do |v|
+    v.vmx["memsize"] = "1024"
+    v.vmx["numvcpus"] = "2"
+    v.vmx["remotedisplay.vnc.enabled"] = "FALSE"
+    v.vmx["isolation.tools.dnd.disable"] = "TRUE"
+    v.vmx["isolation.tools.copy.disable"] = "TRUE"
+    v.vmx["isolation.tools.paste.disable"] = "TRUE"
+    v.vmx["hard-disk.hostBuffer"] = "enabled"
+    v.vmx["chipset.useAcpiBattery"] = "TRUE"
+    v.vmx["chipset.useApmBattery"] = "TRUE"
+  end
+
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "projects/elixir-crm/site.yml"
+    ansible.ask_vault_pass = false
+  end
+end
+
+config.vm.define 'elixir_crm_target' do |config|
+  config.dns.tld = "dev"
+  config.vm.hostname = "crm"
+  config.vm.network "private_network", ip: "192.168.35.12"
+  config.vm.provider "vmware_fusion" do |v|
+    v.vmx["memsize"] = "1024"
+    v.vmx["numvcpus"] = "2"
+    v.vmx["remotedisplay.vnc.enabled"] = "FALSE"
+    v.vmx["isolation.tools.dnd.disable"] = "TRUE"
+    v.vmx["isolation.tools.copy.disable"] = "TRUE"
+    v.vmx["isolation.tools.paste.disable"] = "TRUE"
+    v.vmx["hard-disk.hostBuffer"] = "enabled"
+    v.vmx["chipset.useAcpiBattery"] = "TRUE"
+    v.vmx["chipset.useApmBattery"] = "TRUE"
+  end
+
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "projects/elixir-crm/site.yml"
+    ansible.ask_vault_pass = false
+  end
+end
