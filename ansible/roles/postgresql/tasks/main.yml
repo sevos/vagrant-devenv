@@ -1,10 +1,16 @@
 ---
+- name: 'Install postgresql-9.4 repository key'
+  apt_key: url="https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+  sudo: yes
+- name: 'Install postgresql-9.4 repository'
+  apt_repository: repo="deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main"
+  sudo: yes
 - name: 'Install postgresql packages'
   sudo: yes
   apt: name={{item}} update_cache=yes
   with_items:
-    - postgresql
-    - postgresql-contrib
+    - postgresql-{{postgresql_version}}
+    - postgresql-contrib-{{postgresql_version}}
     - libpq-dev
 - name: 'Create postgres user'
   sudo: yes
